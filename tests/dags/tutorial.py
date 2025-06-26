@@ -29,7 +29,7 @@ import textwrap
 from datetime import datetime, timedelta
 
 # Operators; we need this to operate!
-from airflow.operators.bash import BashOperator
+from airflow.providers.standard.operators.bash import BashOperator
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow.sdk import DAG
@@ -72,55 +72,55 @@ with DAG(
     # t1, t2 and t3 are examples of tasks created by instantiating operators
     # [START basic_task]
 
-[docs]
+
     t1 = BashOperator(
-        task_id="print_date",
-        bash_command="date",
-    )
+            task_id="print_date",
+            bash_command="date",
+        )
 
 
     t2 = BashOperator(
-        task_id="sleep",
-        depends_on_past=False,
-        bash_command="sleep 5",
-        retries=3,
-    )
-    # [END basic_task]
+            task_id="sleep",
+            depends_on_past=False,
+            bash_command="sleep 5",
+            retries=3,
+        )
+        # [END basic_task]
 
-    # [START documentation]
+        # [START documentation]
     t1.doc_md = textwrap.dedent(
-        """\
-    #### Task Documentation
-    You can document your task using the attributes `doc_md` (markdown),
-    `doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
-    rendered in the UI's Task Instance Details page.
-    ![img](https://imgs.xkcd.com/comics/fixing_problems.png)
-    **Image Credit:** Randall Munroe, [XKCD](https://xkcd.com/license.html)
-    """
-    )
+            """\
+        #### Task Documentation
+        You can document your task using the attributes `doc_md` (markdown),
+        `doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
+        rendered in the UI's Task Instance Details page.
+        ![img](https://imgs.xkcd.com/comics/fixing_problems.png)
+        **Image Credit:** Randall Munroe, [XKCD](https://xkcd.com/license.html)
+        """
+        )
 
     dag.doc_md = __doc__  # providing that you have a docstring at the beginning of the DAG; OR
     dag.doc_md = """
-    This is a documentation placed anywhere
-    """  # otherwise, type it like this
-    # [END documentation]
+        This is a documentation placed anywhere
+        """  # otherwise, type it like this
+        # [END documentation]
 
-    # [START jinja_template]
+        # [START jinja_template]
     templated_command = textwrap.dedent(
+            """
+        {% for i in range(5) %}
+            echo "{{ ds }}"
+            echo "{{ macros.ds_add(ds, 7)}}"
+        {% endfor %}
         """
-    {% for i in range(5) %}
-        echo "{{ ds }}"
-        echo "{{ macros.ds_add(ds, 7)}}"
-    {% endfor %}
-    """
-    )
+        )
 
     t3 = BashOperator(
-        task_id="templated",
-        depends_on_past=False,
-        bash_command=templated_command,
-    )
-    # [END jinja_template]
+            task_id="templated",
+            depends_on_past=False,
+            bash_command=templated_command,
+        )
+        # [END jinja_template]
 
     t1 >> [t2, t3]
-# [END tutorial]
+    # [END tutorial]
